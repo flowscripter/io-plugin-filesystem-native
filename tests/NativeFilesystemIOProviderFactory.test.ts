@@ -12,11 +12,13 @@ describe("nativeFilesystemIOProviderFactory", () => {
 
   test("parses locations like the filesystem plugin", () => {
     const location = factory.locationSchema.parse(
-      factory.parseLocationString("file:///data/a.txt"),
+      factory.parseLocationString(
+        process.platform === "win32" ? "file:///C:/data/a.txt" : "file:///data/a.txt",
+      ),
     );
     expect(factory.toProviderInputs(location).target).toEqual({
       kind: "container",
-      key: "/data/a.txt",
+      key: process.platform === "win32" ? "C:\\data\\a.txt" : "/data/a.txt",
     });
   });
 
