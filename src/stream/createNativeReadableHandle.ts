@@ -66,39 +66,42 @@ function itemStream(
     reader?.close();
     onClose?.();
   };
-  return new ReadableStream<Item<PayloadKind.Native>>({
-    async pull(controller) {
-      reader ??= open();
-      for (;;) {
-        const result = native.reader_try_next(
-          reader.id,
-          slotPtrs[0] as never,
-          slotPtrs[1] as never,
-          slotPtrs[2] as never,
-        );
-        if (result === OK) {
-          controller.enqueue({
-            payload: createNativePayload(Number(slots[0]), Number(slots[1]), Number(slots[2])),
-          });
-          return;
+  return new ReadableStream<Item<PayloadKind.Native>>(
+    {
+      async pull(controller) {
+        reader ??= open();
+        for (;;) {
+          const result = native.reader_try_next(
+            reader.id,
+            slotPtrs[0] as never,
+            slotPtrs[1] as never,
+            slotPtrs[2] as never,
+          );
+          if (result === OK) {
+            controller.enqueue({
+              payload: createNativePayload(Number(slots[0]), Number(slots[1]), Number(slots[2])),
+            });
+            return;
+          }
+          if (result === EOF) {
+            close();
+            controller.close();
+            return;
+          }
+          if (result === ERROR) {
+            const message = lastError();
+            close();
+            throw new Error(message);
+          }
+          await waker.ready(reader.id);
         }
-        if (result === EOF) {
-          close();
-          controller.close();
-          return;
-        }
-        if (result === ERROR) {
-          const message = lastError();
-          close();
-          throw new Error(message);
-        }
-        await waker.ready(reader.id);
-      }
+      },
+      cancel() {
+        close();
+      },
     },
-    cancel() {
-      close();
-    },
-  });
+    { highWaterMark: 0 },
+  );
 }
 
 /**

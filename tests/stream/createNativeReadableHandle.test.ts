@@ -117,6 +117,24 @@ describe("createNativeReadableHandle", () => {
     });
   }
 
+  test("no native resources are opened until the stream is read", async () => {
+    let opened = 0;
+    const waker = {
+      open: () => (opened += 1),
+      close: () => (opened -= 1),
+      ready: () => Promise.resolve(),
+    };
+    const handle = createNativeReadableHandle(
+      join(dir, "data.bin"),
+      { chunkSize: 4096, depth: 2, waker: "callback" },
+      waker,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(opened).toBe(0);
+    await (handle.stream as ReadableStream).cancel();
+    expect(opened).toBe(0);
+  });
+
   test("a missing file fails when first read", async () => {
     const handle = createNativeReadableHandle(
       join(dir, "missing.bin"),

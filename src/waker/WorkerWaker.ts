@@ -15,6 +15,10 @@ self.onmessage = (event) => {
 };
 `;
 
+// The native wait queue is process-wide, so a new worker may only start
+// waiting once the previous one has consumed the shutdown marker.
+let previousWorkerStopped: Promise<void> = Promise.resolve();
+
 /**
  * Wakes waiters from one shared Worker per library, parked in the blocking
  * native `wait_any` call and posting back the id of each handle that became
@@ -26,6 +30,7 @@ export class WorkerWaker implements NativeWaker {
   #url?: string;
   #references = 0;
   #started?: Promise<void>;
+  #stopped?: Promise<void>;
   readonly #pending = new Map<number, () => void>();
 
   public open(): void {
@@ -36,6 +41,10 @@ export class WorkerWaker implements NativeWaker {
     this.#url = URL.createObjectURL(new Blob([WORKER_SOURCE], { type: "text/javascript" }));
     const worker = new Worker(this.#url);
     this.#worker = worker;
+    let stopped!: () => void;
+    this.#stopped = new Promise<void>((resolve) => {
+      stopped = resolve;
+    });
     this.#started = new Promise<void>((resolve) => {
       worker.onmessage = (event: MessageEvent<number>) => {
         const handle = event.data;
@@ -43,12 +52,18 @@ export class WorkerWaker implements NativeWaker {
           resolve();
           return;
         }
+        if (handle === 0) {
+          stopped();
+          return;
+        }
         const waiter = this.#pending.get(handle);
         this.#pending.delete(handle);
         waiter?.();
       };
     });
-    worker.postMessage(libPath);
+    const previous = previousWorkerStopped;
+    previousWorkerStopped = this.#stopped;
+    void previous.then(() => worker.postMessage(libPath));
     (worker as unknown as { unref(): void }).unref();
   }
 
@@ -62,12 +77,13 @@ export class WorkerWaker implements NativeWaker {
     this.#worker = undefined;
     this.#url = undefined;
     this.#started = undefined;
-    setTimeout(() => {
+    void this.#stopped?.then(() => {
       worker?.terminate();
       if (url) {
         URL.revokeObjectURL(url);
       }
-    }, 50);
+    });
+    this.#stopped = undefined;
   }
 
   public async ready(handle: number): Promise<void> {
