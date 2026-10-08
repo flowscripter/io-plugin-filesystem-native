@@ -1,6 +1,6 @@
 {
   "name": "@flowscripter/io-plugin-filesystem-native",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Native (Rust) local filesystem source/sink plugin for https://github.com/flowscripter/pluggable-io-framework",
   "keywords": [
     "bun",
@@ -57,7 +57,7 @@
     "@flowscripter/dynamic-plugin-framework": "*",
     "typescript": "^7.0.2"
   },
-  "ffiLibBaseUri": "https://github.com/flowscripter/io-plugin-filesystem-native/releases/download/v0.0.0",
+  "ffiLibBaseUri": "https://github.com/flowscripter/io-plugin-filesystem-native/releases/download/v1.0.0",
   "pluggable-io-framework": {
     "extensionPoints": [
       "@flowscripter/pluggable-io-framework/provider-factory",

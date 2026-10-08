@@ -1,6 +1,6 @@
 [package]
 name = "flowscripter_io_plugin_filesystem_native"
-version = "0.0.0"
+version = "1.0.0"
 edition = "2021"
 description = "Native local filesystem I/O for io-plugin-filesystem-native, exposed via Bun FFI"
 homepage = "https://github.com/flowscripter"
