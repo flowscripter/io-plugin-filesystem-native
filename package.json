@@ -1,0 +1,73 @@
+{
+  "name": "@flowscripter/io-plugin-filesystem-native",
+  "version": "0.0.0",
+  "description": "Native (Rust) local filesystem source/sink plugin for https://github.com/flowscripter/pluggable-io-framework",
+  "keywords": [
+    "bun",
+    "dynamic",
+    "ffi",
+    "framework",
+    "io",
+    "native",
+    "pluggable-io-framework",
+    "plugin",
+    "rust"
+  ],
+  "homepage": "https://github.com/flowscripter/io-plugin-filesystem-native#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flowscripter/io-plugin-filesystem-native.git"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "module": "dist/bundle.js",
+  "exports": {
+    ".": {
+      "default": "./dist/bundle.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build:native": "cargo build --release",
+    "build": "bun build index.ts --outdir ./dist --entry-naming bundle.js --target bun --minify --external \"@flowscripter/dynamic-plugin-framework\"",
+    "test": "bun test",
+    "bench": "bun run bench/copy_bench.ts"
+  },
+  "dependencies": {
+    "@flowscripter/pluggable-io-framework-api": "^3.1.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@flowscripter/dynamic-plugin-framework": "^2.2.19",
+    "@flowscripter/io-plugin-filesystem": "2.0.2",
+    "@flowscripter/pluggable-io-framework": "^2.1.0",
+    "@types/bun": "^1.4.2",
+    "@types/node": "^26.6.4",
+    "oxfmt": "0.72.0",
+    "oxlint": "1.87.0"
+  },
+  "peerDependencies": {
+    "@flowscripter/dynamic-plugin-framework": "*",
+    "typescript": "^7.0.2"
+  },
+  "ffiLibBaseUri": "https://github.com/flowscripter/io-plugin-filesystem-native/releases/download/v0.0.0",
+  "pluggable-io-framework": {
+    "extensionPoints": [
+      "@flowscripter/pluggable-io-framework/provider-factory",
+      "@flowscripter/pluggable-io-framework/payload-converter"
+    ]
+  },
+  "typedocOptions": {
+    "readme": "none",
+    "exclude": [
+      "tests/**"
+    ]
+  }
+}
