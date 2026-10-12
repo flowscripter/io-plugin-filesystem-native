@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { suffix } from "bun:ffi";
-import { copyFile, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildLocalLibName, buildRemoteLibName, buildRemoteUrl } from "../src/lib-path.ts";
@@ -65,7 +65,7 @@ describe("buildRemoteUrl", () => {
 describe("getLibPath", () => {
   test("prefers the local release build", async () => {
     const libName = "flowscripter_io_plugin_filesystem_native";
-    const root = await mkdtemp(join(tmpdir(), "lib-path-"));
+    const root = await realpath(await mkdtemp(join(tmpdir(), "lib-path-")));
     try {
       await mkdir(join(root, "src"));
       await mkdir(join(root, "target", "release"), { recursive: true });
