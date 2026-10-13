@@ -1,12 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { suffix } from "bun:ffi";
+import { copyFile, mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  buildLocalLibName,
-  buildRemoteLibName,
-  buildRemoteUrl,
-  getLibPath,
-} from "../src/lib-path.ts";
+import { buildLocalLibName, buildRemoteLibName, buildRemoteUrl } from "../src/lib-path.ts";
 
 describe("buildLocalLibName", () => {
   test("Linux .so gets lib prefix", () => {
@@ -67,15 +64,23 @@ describe("buildRemoteUrl", () => {
 
 describe("getLibPath", () => {
   test("prefers the local release build", async () => {
-    const libPath = await getLibPath("flowscripter_io_plugin_filesystem_native");
-    expect(libPath).toBe(
-      join(
-        import.meta.dir,
-        "..",
-        "target",
-        "release",
-        buildLocalLibName("flowscripter_io_plugin_filesystem_native", suffix),
-      ),
-    );
+    const libName = "flowscripter_io_plugin_filesystem_native";
+    const root = await realpath(await mkdtemp(join(tmpdir(), "lib-path-")));
+    try {
+      await mkdir(join(root, "src"));
+      await mkdir(join(root, "target", "release"), { recursive: true });
+      await copyFile(
+        join(import.meta.dir, "..", "src", "lib-path.ts"),
+        join(root, "src", "lib-path.ts"),
+      );
+      await copyFile(join(import.meta.dir, "..", "package.json"), join(root, "package.json"));
+      const builtLibPath = join(root, "target", "release", buildLocalLibName(libName, suffix));
+      await writeFile(builtLibPath, "");
+
+      const isolated = await import(join(root, "src", "lib-path.ts"));
+      expect(await isolated.getLibPath(libName)).toBe(builtLibPath);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
   });
 });
