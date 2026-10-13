@@ -26,8 +26,10 @@
   ],
   "type": "module",
   "module": "dist/bundle.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "default": "./dist/bundle.js"
     }
   },
@@ -36,7 +38,7 @@
   },
   "scripts": {
     "build:native": "cargo build --release",
-    "build": "bun build index.ts --outdir ./dist --entry-naming bundle.js --target bun --minify --external \"@flowscripter/dynamic-plugin-framework\"",
+    "build": "bun build index.ts --outdir ./dist --entry-naming bundle.js --target bun --minify --external \"@flowscripter/dynamic-plugin-framework\" && tsc -p tsconfig.build.json",
     "test": "bun test",
     "bench": "bun run bench/copy_bench.ts"
   },
