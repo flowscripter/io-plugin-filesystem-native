@@ -62,6 +62,7 @@ function itemStream(
   onClose?: () => void,
 ): ReadableStream<Item<PayloadKind.Native>> {
   let reader: OpenReader | undefined;
+  let cancelled = false;
   const close = () => {
     reader?.close();
     onClose?.();
@@ -71,6 +72,9 @@ function itemStream(
       async pull(controller) {
         reader ??= open();
         for (;;) {
+          if (cancelled) {
+            return;
+          }
           const result = native.reader_try_next(
             reader.id,
             slotPtrs[0] as never,
@@ -78,9 +82,17 @@ function itemStream(
             slotPtrs[2] as never,
           );
           if (result === OK) {
-            controller.enqueue({
-              payload: createNativePayload(Number(slots[0]), Number(slots[1]), Number(slots[2])),
-            });
+            const payload = createNativePayload(
+              Number(slots[0]),
+              Number(slots[1]),
+              Number(slots[2]),
+            );
+            try {
+              controller.enqueue({ payload });
+            } catch (error) {
+              payload.release();
+              throw error;
+            }
             return;
           }
           if (result === EOF) {
@@ -97,6 +109,7 @@ function itemStream(
         }
       },
       cancel() {
+        cancelled = true;
         close();
       },
     },

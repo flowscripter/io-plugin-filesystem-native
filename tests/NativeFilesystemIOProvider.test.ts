@@ -81,6 +81,23 @@ describe("NativeFilesystemIOProvider", () => {
     });
   }
 
+  test("cancelling a read stream with a pending read ends it cleanly", async () => {
+    const provider = new NativeFilesystemIOProvider(
+      nativeFilesystemConfigSchema.parse({ chunkSize: 65536 }),
+    );
+    const source = await provider.getReadableStream(join(dir, "source.bin"));
+    const reader = (source.stream as ReadableStream<Item<PayloadKind.Native>>).getReader();
+    const first = await reader.read();
+    first.value?.payload.release();
+    const pending = reader.read();
+    await reader.cancel();
+    const result = await pending;
+    if (!result.done) {
+      result.value.payload.release();
+    }
+    await provider[Symbol.asyncDispose]();
+  });
+
   test("copies native to js with the converter", async () => {
     const native = new NativeFilesystemIOProvider(nativeFilesystemConfigSchema.parse({}));
     const js = await filesystemIOProviderFactory.createProvider(
