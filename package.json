@@ -45,9 +45,9 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@flowscripter/dynamic-plugin-framework": "^2.3.3",
-    "@flowscripter/io-plugin-filesystem": "2.0.8",
-    "@flowscripter/pluggable-io-framework": "^2.1.8",
+    "@flowscripter/dynamic-plugin-framework": "^2.3.4",
+    "@flowscripter/io-plugin-filesystem": "2.0.9",
+    "@flowscripter/pluggable-io-framework": "^2.1.9",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
     "oxfmt": "0.75.0",
