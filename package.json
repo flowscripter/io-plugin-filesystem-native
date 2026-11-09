@@ -41,17 +41,17 @@
     "bench": "bun run bench/copy_bench.ts"
   },
   "dependencies": {
-    "@flowscripter/pluggable-io-framework-api": "^3.1.6",
+    "@flowscripter/pluggable-io-framework-api": "^3.1.8",
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@flowscripter/dynamic-plugin-framework": "^2.3.4",
-    "@flowscripter/io-plugin-filesystem": "2.0.9",
-    "@flowscripter/pluggable-io-framework": "^2.1.10",
+    "@flowscripter/dynamic-plugin-framework": "^2.3.5",
+    "@flowscripter/io-plugin-filesystem": "2.0.10",
+    "@flowscripter/pluggable-io-framework": "^2.1.11",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
-    "oxfmt": "0.76.0",
-    "oxlint": "1.91.0"
+    "oxfmt": "0.77.0",
+    "oxlint": "1.92.0"
   },
   "peerDependencies": {
     "@flowscripter/dynamic-plugin-framework": "*",
