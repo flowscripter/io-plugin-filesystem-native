@@ -47,11 +47,11 @@
   "devDependencies": {
     "@flowscripter/dynamic-plugin-framework": "^2.3.6",
     "@flowscripter/io-plugin-filesystem": "2.0.11",
-    "@flowscripter/pluggable-io-framework": "^2.1.13",
+    "@flowscripter/pluggable-io-framework": "^2.1.14",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
-    "oxfmt": "0.78.0",
-    "oxlint": "1.93.0"
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0"
   },
   "peerDependencies": {
     "@flowscripter/dynamic-plugin-framework": "*",
